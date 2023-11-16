@@ -25,7 +25,7 @@ const initialiseDBAndServer = async (request, response) => {
 initialiseDBAndServer();
 
 const validPassword = (password) => {
-  return password.length > 4;
+  return password.length < 5;
 };
 
 app.post("/register", async (request, response) => {
