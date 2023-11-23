@@ -38,7 +38,7 @@ app.post("/register", async (request, response) => {
     const createUserQuery = `INSERT INTO user (username,name,password,gender,location) VALUES ('${username}', '${name}', '${hashedPassword}', '${gender}', '${location}';`;
     if (validatePassword(password)) {
       await database.run(createUserQuery);
-      response.send("User Created Successfully");
+      response.send("User created successfully");
     } else {
       response.status(400);
       response.send("Password is too short");
@@ -55,17 +55,17 @@ app.post("/login", async (request, response) => {
   const databaseUser = await database.get(selectUserQuery);
   if (databaseUser === undefined) {
     response.status(400);
-    response.send("Invalid User");
+    response.send("Invalid user");
   } else {
     const isPasswordMatched = await bcrypt.compare(
       password,
       databaseUser.password
     );
     if (isPasswordMatched === true) {
-      response.send("Login Success!");
+      response.send("Login success!");
     } else {
       response.send(400);
-      response.send("Invalid Password");
+      response.send("Invalid password");
     }
   }
 });
@@ -88,7 +88,7 @@ app.put("/change-password", async (request, response) => {
         const hashPassword = await bcrypt.hash(newPassword, 10);
         const updateQueryPassword = `UPDATE user SET password = '${hashedPassword}' WHERE username='${username}';`;
         const user = await database.run(updateQueryPassword);
-        response.send("Password Updated");
+        response.send("Password updated");
       } else {
         response.status(400);
         response.send("Password is too short");
