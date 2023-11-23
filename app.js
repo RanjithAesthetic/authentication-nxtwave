@@ -34,7 +34,7 @@ app.post("/register", async (request, response) => {
   const selectUserQuery = `SELECT * FROM user WHERE username ='${username}';`;
   const databaseUser = await database.get(selectUserQuery);
 
-  if (database === undefined) {
+  if (databaseUser === undefined) {
     const createUserQuery = `INSERT INTO user (username,name,password,gender,location) VALUES ('${username}', '${name}', '${hashedPassword}', '${gender}', '${location}';`;
     if (validatePassword(password)) {
       await database.run(createUserQuery);
@@ -45,7 +45,7 @@ app.post("/register", async (request, response) => {
     }
   } else {
     response.status(400);
-    response.send("User Already Exists");
+    response.send("User already exists");
   }
 });
 
@@ -84,7 +84,7 @@ app.put("/change-password", async (request, response) => {
       databaseUser.password
     );
     if (isPasswordMatched === true) {
-      if (validPassword(newPassword)) {
+      if (validatePassword(newPassword)) {
         const hashPassword = await bcrypt.hash(newPassword, 10);
         const updateQueryPassword = `UPDATE user SET password = '${hashedPassword}' WHERE username='${username}';`;
         const user = await database.run(updateQueryPassword);
