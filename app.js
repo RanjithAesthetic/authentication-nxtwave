@@ -1,11 +1,11 @@
 const express = require("express");
 const { open } = require("sqlite");
 const sqlite3 = require("sqlite3");
-const app = express();
 const path = require("path");
 const bcrypt = require("bcrypt");
+const app = express();
 app.use(express.json());
-const dbPath = require(__dirname, "userData.db");
+const dbPath = path.join(__dirname, "userData.db");
 let database = null;
 
 const initialiseDBAndServer = async () => {
@@ -14,8 +14,8 @@ const initialiseDBAndServer = async () => {
       filename: dbPath,
       driver: sqlite3.Database,
     });
-    app.listen(3000, () =>{
-      console.log("Server Running at http://localhost:3000/")
+    app.listen(3000, () => {
+      console.log("Server Running at http://localhost:3000/");
     });
   } catch (e) {
     console.log(`DB Error: ${e.message}`);
@@ -24,29 +24,30 @@ const initialiseDBAndServer = async () => {
 };
 initialiseDBAndServer();
 
-const validPassword = (password) => {
+const validatePassword = (password) => {
   return password.length < 5;
 };
 
 app.post("/register", async (request, response) => {
   const { username, name, password, gender, location } = request.body;
   const hashedPassword = await bcrypt.hash(password, 10);
-  const selectUserQuery = `SELECT * FROM user WHERE username = '${username}';`;
+  const selectUserQuery = `SELECT * FROM user WHERE username ='${username}';`;
   const databaseUser = await database.get(selectUserQuery);
-  if(databaseUser === undefined){
-      const createUserQuery = `INSERT INTO user (username,name,password,gender,location) VALUES ('${username}','${name}','${hashedPassword}','${gender}','${location}');`;
-      if(validPassword(password)){
-          await database.run(createUserQuery);
-          response.send("User Created Successfully");
-      }else{
-          response.status(400);
-          response.send("Password is too short");
-      }
-  }else{
-      response.status(400);
-      response.send("User already exists");
-  }
 
+  if (database === undefined) {
+    const createUserQuery = `INSERT INTO user (username,name,password,gender,location) VALUES ('${username}', '${name}', '${hashedPassword}', '${gender}', '${location}';`;
+    if (validatePassword(password)) {
+      await database.run(createUserQuery);
+      response.send("User Created Successfully");
+    } else {
+      response.status(400);
+      response.send("Password is too short");
+    }
+  } else {
+    response.status(400);
+    response.send("User Already Exists");
+  }
+});
 
 app.post("/login", async (request, response) => {
   const { username, password } = request.body;
@@ -98,5 +99,5 @@ app.put("/change-password", async (request, response) => {
     }
   }
 });
-//Export the module
+
 module.exports = app;
